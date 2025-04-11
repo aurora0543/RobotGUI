@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/map">
+        <file>resources/hospital_map.svg</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>resources/background.png</file>
+    </qresource>
+</RCC>

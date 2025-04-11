@@ -1,0 +1,25 @@
+#ifndef SVGVIEWER_H
+#define SVGVIEWER_H
+
+#include <QGraphicsView>
+
+class QGraphicsScene;
+class QGraphicsSvgItem;
+
+class SvgViewer : public QGraphicsView
+{
+    Q_OBJECT
+public:
+    explicit SvgViewer(QWidget* parent = nullptr);
+    void loadSvg(const QString &filePath);
+
+protected:
+    void mousePressEvent(QMouseEvent* event) override;
+    void wheelEvent(QWheelEvent* event) override;
+
+private:
+    QGraphicsScene* scene;           // 场景
+    QGraphicsSvgItem* backgroundItem; // 显示SVG的背景图层
+};
+
+#endif // SVGVIEWER_H
