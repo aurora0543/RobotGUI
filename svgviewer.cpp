@@ -5,6 +5,10 @@
 #include <QWheelEvent>
 #include <QFile>
 #include <QDebug>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 SvgViewer::SvgViewer(QWidget* parent)
     : QGraphicsView(parent),
@@ -46,24 +50,55 @@ void SvgViewer::loadSvg(const QString &filePath) {
 }
 
 void SvgViewer::mousePressEvent(QMouseEvent* event) {
-    // 将点击位置转换成 scene 坐标（视图坐标与 scene 坐标不再因拖拽而偏移）
     QPointF scenePos = mapToScene(event->pos());
-    qDebug() << "点击的 scene 坐标:" << scenePos;
-
-    // 计算 scene 坐标在背景区域内的相对位置（0～1）
     QRectF rect = scene->sceneRect();
+
     if (!rect.isValid() || rect.isEmpty()) {
         qDebug() << "❌ 无法获取背景区域信息！";
     } else {
         double relativeX = (scenePos.x() - rect.x()) / rect.width();
         double relativeY = (scenePos.y() - rect.y()) / rect.height();
-        // 映射到 100×50 的矩阵中
         int col = static_cast<int>(relativeX * 100);
         int row = static_cast<int>(relativeY * 50);
         qDebug() << "映射到矩阵 (100x50) 中的坐标:" << "(" << col << "," << row << ")";
+
+        // 加载 JSON 文件
+        QFile file(":/map/resources/map.json");
+        if (!file.open(QIODevice::ReadOnly)) {
+            qWarning() << "无法打开 JSON 文件！";
+            return;
+        }
+
+        QByteArray data = file.readAll();
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        if (!doc.isObject()) {
+            qWarning() << "JSON 解析失败！";
+            return;
+        }
+
+        QJsonObject root = doc.object();
+        QJsonArray departments = root["departments"].toArray();
+
+        bool found = false;
+        for (const QJsonValue& value : departments) {
+            QJsonObject dept = value.toObject();
+            int x1 = dept["x1"].toInt();
+            int y1 = dept["y1"].toInt();
+            int x2 = dept["x2"].toInt();
+            int y2 = dept["y2"].toInt();
+
+            if (col >= x1 && col <= x2 && row >= y1 && row <= y2) {
+                qDebug() << "📍 属于科室:" << dept["name"].toString();
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            qDebug() << "点击位置未落入任何科室范围";
+        }
     }
 
-    // 调用基类以保持其他鼠标事件行为
     QGraphicsView::mousePressEvent(event);
 }
 

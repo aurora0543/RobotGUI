@@ -11,7 +11,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 # Find Qt6 packages
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Svg SvgWidgets Sql Xml)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Svg SvgWidgets Sql Xml Network)
 
 # 项目源码
 set(PROJECT_SOURCES
@@ -40,6 +40,7 @@ target_link_libraries(RobotGUI PRIVATE
     Qt6::SvgWidgets
     Qt6::Sql
     Qt6::Xml
+    Qt6::Network
 )
 
 # 加入头文件目录（非必须，但有时能避免找不到头文件）

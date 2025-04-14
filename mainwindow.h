@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include <QNetworkAccessManager>
 
 #include "patientdatabase.h"
 
@@ -28,5 +28,11 @@ private slots:
 
 private:
     PatientDatabase *patientDb;
+
+private slots:
+    void translateTextBrowserContent();
+
+private:
+    QNetworkAccessManager *networkManager;
 };
 #endif // MAINWINDOW_H

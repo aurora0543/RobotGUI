@@ -1,0 +1,85 @@
+{
+  "departments": [
+    {
+      "name": "Diagnostic & Support",
+      "x1": 0,
+      "y1": 0,
+      "x2": 14,
+      "y2": 48
+    },
+    {
+      "name": "Registration",
+      "x1": 20,
+      "y1": 30,
+      "x2": 80,
+      "y2": 38
+    },
+    {
+      "name": "Emergency Room",
+      "x1": 20,
+      "y1": 38,
+      "x2": 33,
+      "y2": 48
+    },
+    {
+      "name": "Outpatient Department",
+      "x1": 65,
+      "y1": 38,
+      "x2": 80,
+      "y2": 48
+    },
+    {
+      "name": "Specialty Clinics",
+      "x1": 20,
+      "y1": 0,
+      "x2": 33,
+      "y2": 10
+    },
+    {
+      "name": "Mental Health & Rehab",
+      "x1": 42,
+      "y1": 0,
+      "x2": 56,
+      "y2": 10
+    },
+    {
+      "name": "Internal Medicine Departments",
+      "x1": 20,
+      "y1": 14,
+      "x2": 33,
+      "y2": 24
+    },
+    {
+      "name": "Restroom / Toilet",
+      "x1": 65,
+      "y1": 0,
+      "x2": 79,
+      "y2": 8
+    },
+    {
+      "name": "Surgical Departments",
+      "x1": 42,
+      "y1": 14,
+      "x2": 56,
+      "y2": 24
+    },
+    {
+      "name": "Obstetrics, Gynecology, Pediatrics",
+      "x1": 56,
+      "y1": 24,
+      "x2": 80,
+      "y2": 24
+    },
+    {
+      "name": "Patient Rooms",
+      "x1": 85,
+      "y1": 0,
+      "x2": 98,
+      "y2": 48
+    }
+  ],
+  "coordinate_limit": {
+    "x_max": 100,
+    "y_max": 50
+  }
+}
