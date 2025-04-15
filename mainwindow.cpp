@@ -16,6 +16,8 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
+#include <QMessageBox>
+
 std::string run_spark_asr();
 
 MainWindow::MainWindow(QWidget *parent)
@@ -26,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     //QTimer::singleShot(500, this, &MainWindow::translateTextBrowserContent);
     networkManager = new QNetworkAccessManager(this);
     connect(ui->pushButton_4, &QPushButton::clicked, this, &MainWindow::translateTextBrowserContent);
+    connect(ui->pushButton_enter, &QPushButton::clicked, this, &MainWindow::onEnterClicked);
 
     // creat timer and update timer
     QTimer *timer = new QTimer(this);
@@ -35,12 +38,14 @@ MainWindow::MainWindow(QWidget *parent)
     updateTime();
 
     ui->graphicsView_map->loadSvg(":/map/resources/hospital_map.svg");
-
-    patientDb = new PatientDatabase(this);
-    if(patientDb->connectToDatabase(""))
+    PatientDatabase Db;
+    if(!Db.connectToDatabase(""))
     {
-
+        qDebug()<<"数据库错误", "无法连接到数据库！";
     }
+    Db.printAllPatients();
+
+
 
 
 }
@@ -120,4 +125,24 @@ void MainWindow::translateTextBrowserContent()
             ui->textBrowser->append("⚠️ 翻译内容为空。");
         }
     });
+}
+
+void MainWindow::onEnterClicked()
+{
+    QString name = ui->lineEdit_name->text();
+    QDate birthDate = ui->dateEdit->date();
+    QString gender = ui->comboBox_gender->currentText();
+
+    if (name.isEmpty()) {
+        QMessageBox::warning(this, "输入错误", "请输入姓名！");
+        return;
+    }
+
+    int id = patientDb->getPatientID(name, birthDate, gender);
+
+    if (id > 0) {
+        QMessageBox::information(this, "查询成功", QString("找到病人！Patient ID: %1").arg(id));
+    } else {
+        QMessageBox::warning(this, "未找到", "未在数据库中找到该病人。");
+    }
 }

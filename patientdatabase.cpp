@@ -13,15 +13,18 @@ PatientDatabase::~PatientDatabase()
     }
 }
 
-bool PatientDatabase::connectToDatabase(const QString &dbPath)
+bool PatientDatabase::connectToDatabase(const QString &)
 {
-    db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("localhost");
-    db.setPort(3306);
-    db.setDatabaseName("HospitalGuide");
-    db.setUserName("root");
-    db.setPassword("team24");
-
+    if (QSqlDatabase::contains("hospital_connection")) {
+        db = QSqlDatabase::database("hospital_connection");
+    } else {
+        db = QSqlDatabase::addDatabase("QMYSQL", "hospital_connection");
+        db.setHostName("localhost");
+        db.setPort(3306);
+        db.setDatabaseName("HospitalGuide");
+        db.setUserName("root");
+        db.setPassword("");
+    }
 
     if (!db.open()) {
         qDebug() << "数据库连接失败:" << db.lastError().text();
@@ -34,28 +37,103 @@ bool PatientDatabase::connectToDatabase(const QString &dbPath)
 
 bool PatientDatabase::addPatient(int id, const QString &name, const QDate &birthDate,
                                  const QString &gender, const QString &visitType,
-                                 const QByteArray &photo)
+                                 const QString &photoPath)
 {
-    QSqlQuery query;
-    query.prepare("INSERT INTO Patients (PatientID, Name, BirthDate, Gender, VisitType, Photo) "
-                  "VALUES (:id, :name, :birthDate, :gender, :visitType, :photo)");
+    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
+    if (!db.isOpen()) {
+        qDebug() << "添加病人失败：数据库未打开";
+        return false;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO Patients (PatientID, Name, BirthDate, Gender, VisitType, PhotoPath) "
+                  "VALUES (:id, :name, :birthDate, :gender, :visitType, :photoPath)");
     query.bindValue(":id", id);
     query.bindValue(":name", name);
     query.bindValue(":birthDate", birthDate);
     query.bindValue(":gender", gender);
     query.bindValue(":visitType", visitType);
-    query.bindValue(":photo", photo);
+    query.bindValue(":photoPath", photoPath);
 
     if (!query.exec()) {
         qDebug() << "添加病人失败:" << query.lastError().text();
         return false;
     }
 
+    qDebug() << "成功添加病人:" << name;
     return true;
 }
 
+int PatientDatabase::getPatientID(const QString &name, const QDate &birthDate, const QString &gender)
+{
+    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
+    if (!db.isOpen()) {
+        qDebug() << "数据库未打开！";
+        return -1;
+    }
+
+
+    QSqlQuery query(db);  // 关键点：绑定连接！
+
+    query.prepare("SELECT PatientID FROM Patients WHERE Name = :name");
+    query.bindValue(":name", name);
+    query.bindValue(":birthDate", birthDate);
+    query.bindValue(":gender", gender);
+
+    if (!query.exec()) {
+        qDebug() << "查询失败:" << query.lastError().text();
+        return -1;
+    }
+
+    if (query.next()) {
+        return query.value(0).toInt();
+    } else {
+        return 0;
+    }
+}
+
+void PatientDatabase::printAllPatients()
+{
+    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
+    if (!db.isOpen()) {
+        qDebug() << "无法打印病人列表：数据库未打开";
+        return;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM Patients");
+
+    if (!query.exec()) {
+        qDebug() << "查询失败:" << query.lastError().text();
+        return;
+    }
+
+    while (query.next()) {
+        int id = query.value("PatientID").toInt();
+        QString name = query.value("Name").toString();
+        QDate birthDate = query.value("BirthDate").toDate();
+        QString gender = query.value("Gender").toString();
+        QString visitType = query.value("VisitType").toString();
+        QString photoPath = query.value("PhotoPath").toString();
+
+        qDebug() << "PatientID:" << id
+                 << "| Name:" << name
+                 << "| BirthDate:" << birthDate.toString("yyyy-MM-dd")
+                 << "| Gender:" << gender
+                 << "| VisitType:" << visitType
+                 << "| PhotoPath:" << photoPath;
+    }
+}
 QSqlQuery PatientDatabase::getAllPatients()
 {
-    QSqlQuery query("SELECT * FROM Patients");
+    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
+    QSqlQuery query(db);
+
+    query.prepare("SELECT * FROM Patients");
+
+    if (!query.exec()) {
+        qDebug() << "查询失败:" << query.lastError().text();
+    }
+
     return query;
 }

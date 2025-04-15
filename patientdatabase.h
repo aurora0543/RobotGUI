@@ -17,9 +17,11 @@ public:
     ~PatientDatabase();
 
     bool connectToDatabase(const QString &dbPath);
+    void printAllPatients();
     bool addPatient(int id, const QString &name, const QDate &birthDate,
-                    const QString &gender, const QString &visitType,
-                    const QByteArray &photo);
+                                     const QString &gender, const QString &visitType,
+                                     const QString &photoPath);
+    int getPatientID(const QString &name, const QDate &birthDate, const QString &gender);
 
     QSqlQuery getAllPatients();
 

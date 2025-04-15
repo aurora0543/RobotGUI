@@ -34,5 +34,8 @@ private slots:
 
 private:
     QNetworkAccessManager *networkManager;
+
+private:
+    void onEnterClicked();
 };
 #endif // MAINWINDOW_H
