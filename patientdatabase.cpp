@@ -19,10 +19,10 @@ bool PatientDatabase::connectToDatabase(const QString &)
         db = QSqlDatabase::database("hospital_connection");
     } else {
         db = QSqlDatabase::addDatabase("QMYSQL", "hospital_connection");
-        db.setHostName("localhost");
+        db.setHostName("192.168.1.104");
         db.setPort(3306);
         db.setDatabaseName("HospitalGuide");
-        db.setUserName("root");
+        db.setUserName("remote_user");
         db.setPassword("");
     }
 
@@ -92,6 +92,21 @@ int PatientDatabase::getPatientID(const QString &name, const QDate &birthDate, c
     }
 }
 
+
+QSqlQuery PatientDatabase::getAllPatients()
+{
+    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
+    QSqlQuery query(db);
+
+    query.prepare("SELECT * FROM Patients");
+
+    if (!query.exec()) {
+        qDebug() << "查询失败:" << query.lastError().text();
+    }
+
+    return query;
+}
+
 void PatientDatabase::printAllPatients()
 {
     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
@@ -123,17 +138,4 @@ void PatientDatabase::printAllPatients()
                  << "| VisitType:" << visitType
                  << "| PhotoPath:" << photoPath;
     }
-}
-QSqlQuery PatientDatabase::getAllPatients()
-{
-    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
-    QSqlQuery query(db);
-
-    query.prepare("SELECT * FROM Patients");
-
-    if (!query.exec()) {
-        qDebug() << "查询失败:" << query.lastError().text();
-    }
-
-    return query;
 }

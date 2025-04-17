@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         qDebug()<<"数据库错误", "无法连接到数据库！";
     }
-    Db.printAllPatients();
+    //Db.printAllPatients();
 
 
 
