@@ -78,7 +78,7 @@ void SvgViewer::mousePressEvent(QMouseEvent* event) {
         }
 
         // 加载 JSON 文件
-        QFile file(":/map/resources/map.json");
+        QFile file("/home/team24/RoboHospitalGuide/RobotGUI/resources/map.json");
         if (!file.open(QIODevice::ReadOnly)) {
             if (browser)
                 browser->append(QStringLiteral("无法打开 JSON 文件！"));
@@ -113,9 +113,11 @@ void SvgViewer::mousePressEvent(QMouseEvent* event) {
                 if (browser)
                 {
                     browser->append(QStringLiteral("📍 属于科室: %1").arg(deptName));
+                    emit departmentSelected(deptName);
                 }
                 else
                     qDebug() << "📍 属于科室:" << deptName;
+                
                 found = true;
 
                 break;

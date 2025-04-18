@@ -21,6 +21,9 @@ protected:
 private:
     QGraphicsScene* scene;           // 场景
     QGraphicsSvgItem* backgroundItem; // 显示SVG的背景图层
+
+signals:
+    void departmentSelected(const QString& name);  // 添加这个信号
 };
 
 #endif // SVGVIEWER_H

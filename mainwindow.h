@@ -7,6 +7,8 @@
 #include "patientdatabase.h"
 #include "svgviewer.h"
 
+#include "maincontroller.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -42,6 +44,9 @@ private:
     void onClearClicked();
     void on_pushButton_nav_clicked();
     void onDepartmentSelected(const QString &deptName);
+
+
+    MainController controller;
 
 private:
     bool isFullScreenNow = false;

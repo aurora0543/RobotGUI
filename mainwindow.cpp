@@ -17,6 +17,7 @@
 #include <QJsonValue>
 
 #include <QMessageBox>
+#include "maincontroller.h"
 
 std::string run_spark_asr();
 
@@ -47,6 +48,12 @@ MainWindow::MainWindow(QWidget *parent)
         QMessageBox::about(nullptr, "关于", "医院导诊系统\n版本 1.0\n作者: Your Name");
     });
 
+    connect(ui->graphicsView_map, &SvgViewer::departmentSelected, this, [=](const QString& deptName){
+        ui->label_apart->setText(deptName);  // 假设你界面上有 QLabel 叫 label_department
+    });
+
+
+
     // create timer and update timer
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateTime);
@@ -54,14 +61,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     updateTime();
 
-    ui->graphicsView_map->loadSvg(":/map/resources/hospital_map.svg");
+    ui->graphicsView_map->loadSvg("/home/team24/RoboHospitalGuide/RobotGUI/resources/hospital_map.svg");
     PatientDatabase Db;
     if(!Db.connectToDatabase(""))
     {
         qDebug()<<"数据库错误", "无法连接到数据库！";
     }
-
-    
+    // 连接信号槽
+    controller.init();
 
 }
 
@@ -78,7 +85,7 @@ void MainWindow::on_pushButton_nav_clicked()
 
     // 2. 获取要导航的科室名称（假设你有一个 label_aprt 里保存了目标科室名）
     QString departmentName = ui->label_apart->text();
-
+    controller.startNavigationTo(departmentName);
     // 3. 在终端输出或后续使用
     qDebug() << "🧭 正在导航到科室：" << departmentName;
 
