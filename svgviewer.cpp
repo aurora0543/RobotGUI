@@ -11,7 +11,6 @@
 #include <QJsonArray>
 #include <QTextBrowser>
 #include <QString>
-#include <glob.h>
 
 SvgViewer::SvgViewer(QWidget* parent)
     : QGraphicsView(parent),
@@ -114,7 +113,6 @@ void SvgViewer::mousePressEvent(QMouseEvent* event) {
                 if (browser)
                 {
                     browser->append(QStringLiteral("📍 属于科室: %1").arg(deptName));
-                    extern std::string clickedAddress = deptName.toStdString();
                 }
                 else
                     qDebug() << "📍 属于科室:" << deptName;

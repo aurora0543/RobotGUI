@@ -18,9 +18,6 @@
 
 #include <QMessageBox>
 
-#include "globals.h"
-
-
 std::string run_spark_asr();
 
 MainWindow::MainWindow(QWidget *parent)
@@ -227,6 +224,4 @@ void MainWindow::onClearClicked()
     ui->dateEdit->clear();
     ui->label_id->clear();
     ui->label_reg->clear();
-
-    qDebug()<< QString::fromStdString(clickedAddress);
 }
