@@ -3,8 +3,9 @@
 
 #include <QMainWindow>
 #include <QNetworkAccessManager>
-
+#include <string>
 #include "patientdatabase.h"
+#include "svgviewer.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,6 +20,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
 
 private:
     Ui::MainWindow *ui;
@@ -37,5 +39,13 @@ private:
 
 private:
     void onEnterClicked();
+    void onClearClicked();
+    void on_pushButton_nav_clicked();
+    void onDepartmentSelected(const QString &deptName);
+
+private:
+    bool isFullScreenNow = false;
+
+
 };
 #endif // MAINWINDOW_H

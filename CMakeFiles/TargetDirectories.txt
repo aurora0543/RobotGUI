@@ -1,0 +1,9 @@
+/root/RobotGUI/CMakeFiles/RobotGUI.dir
+/root/RobotGUI/CMakeFiles/edit_cache.dir
+/root/RobotGUI/CMakeFiles/rebuild_cache.dir
+/root/RobotGUI/CMakeFiles/list_install_components.dir
+/root/RobotGUI/CMakeFiles/install.dir
+/root/RobotGUI/CMakeFiles/install/local.dir
+/root/RobotGUI/CMakeFiles/install/strip.dir
+/root/RobotGUI/CMakeFiles/RobotGUI_autogen_timestamp_deps.dir
+/root/RobotGUI/CMakeFiles/RobotGUI_autogen.dir

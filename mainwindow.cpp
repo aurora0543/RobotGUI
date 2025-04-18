@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-
+#include "svgviewer.h"
 #include <QTimer>
 #include <QDateTime>
 #include <QDebug>
@@ -18,6 +18,9 @@
 
 #include <QMessageBox>
 
+#include "globals.h"
+
+
 std::string run_spark_asr();
 
 MainWindow::MainWindow(QWidget *parent)
@@ -25,14 +28,31 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    //QTimer::singleShot(500, this, &MainWindow::translateTextBrowserContent);
     networkManager = new QNetworkAccessManager(this);
     connect(ui->pushButton_4, &QPushButton::clicked, this, &MainWindow::translateTextBrowserContent);
     connect(ui->pushButton_enter, &QPushButton::clicked, this, &MainWindow::onEnterClicked);
+    connect(ui->pushButton_clear, &QPushButton::clicked, this, &MainWindow::onClearClicked);
+    connect(ui->pushButton_nav, &QPushButton::clicked, this, &MainWindow::on_pushButton_nav_clicked);
+    connect(ui->actionExit, &QAction::triggered, this, [](){
+        qApp->quit(); // 替代 close()
+    });
+    connect(ui->actionFull_Screen, &QAction::triggered, this, [this] {
+        if (isFullScreenNow) {
+            showNormal();
+            isFullScreenNow = false;
+        } else {
+            showFullScreen();
+            isFullScreenNow = true;
+        }
+    });
 
-    // creat timer and update timer
+    connect(ui->actionAbout, &QAction::triggered, this, []() {
+        QMessageBox::about(nullptr, "关于", "医院导诊系统\n版本 1.0\n作者: Your Name");
+    });
+
+    // create timer and update timer
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout,this, &MainWindow::updateTime);
+    connect(timer, &QTimer::timeout, this, &MainWindow::updateTime);
     timer->start(1000);
 
     updateTime();
@@ -43,16 +63,29 @@ MainWindow::MainWindow(QWidget *parent)
     {
         qDebug()<<"数据库错误", "无法连接到数据库！";
     }
-    //Db.printAllPatients();
 
-
-
+    
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+
+void MainWindow::on_pushButton_nav_clicked()
+{
+    // 1. 切换页面
+    ui->stackedWidget_mainDisplay->setCurrentWidget(ui->page_navigation);
+
+    // 2. 获取要导航的科室名称（假设你有一个 label_aprt 里保存了目标科室名）
+    QString departmentName = ui->label_apart->text();
+
+    // 3. 在终端输出或后续使用
+    qDebug() << "🧭 正在导航到科室：" << departmentName;
+
+    // 如果你希望返回这个值，也可以通过信号发出去或保存到成员变量
 }
 
 void MainWindow::updateTime()
@@ -63,14 +96,25 @@ void MainWindow::updateTime()
 
 void MainWindow::translateTextBrowserContent()
 {
-    QString originalText = ui->textBrowser->toPlainText();
+    QString originalText = ui->plainTextEdit_translate->toPlainText();
     if (originalText.trimmed().isEmpty()) {
-        ui->textBrowser->append("\n⚠️ 无原始文本，不执行翻译。");
+        qDebug() << "⚠️ 无原始文本，不执行翻译。";
         return;
     }
 
-    QString sourceLang = "auto";  // 自动检测源语言
-    QString targetLang = "zh";
+    // 获取语言设置
+    QString sourceLang, targetLang;
+
+    QString from = ui->comboBox_from->currentText().toLower();
+    QString to = ui->comboBox_to->currentText().toLower();
+
+    if (from == "english") sourceLang = "en";
+    else if (from == "chinese") sourceLang = "zh";
+    else sourceLang = "auto";
+
+    if (to == "english") targetLang = "en";
+    else if (to == "chinese") targetLang = "zh";
+    else targetLang = "zh";
 
     QUrl url("https://translate.googleapis.com/translate_a/single");
     QUrlQuery query;
@@ -86,7 +130,7 @@ void MainWindow::translateTextBrowserContent()
 
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         if (reply->error() != QNetworkReply::NoError) {
-            ui->textBrowser->append("❌ 网络错误: " + reply->errorString());
+            qDebug() << "❌ 网络错误:" << reply->errorString();
             reply->deleteLater();
             return;
         }
@@ -97,18 +141,18 @@ void MainWindow::translateTextBrowserContent()
         QJsonParseError parseError;
         QJsonDocument json = QJsonDocument::fromJson(responseData, &parseError);
         if (parseError.error != QJsonParseError::NoError) {
-            ui->textBrowser->append("⚠️ JSON 解析失败: " + parseError.errorString());
+            qDebug() << "⚠️ JSON 解析失败:" << parseError.errorString();
             return;
         }
 
         if (!json.isArray()) {
-            ui->textBrowser->append("⚠️ 响应不是数组格式！");
+            qDebug() << "⚠️ 响应不是数组格式！";
             return;
         }
 
         QJsonArray rootArray = json.array();
         if (rootArray.isEmpty() || !rootArray[0].isArray()) {
-            ui->textBrowser->append("⚠️ 无翻译内容！");
+            qDebug() << "⚠️ 无翻译内容！";
             return;
         }
 
@@ -119,11 +163,7 @@ void MainWindow::translateTextBrowserContent()
                 translatedText += chunk.toArray().at(0).toString();
         }
 
-        if (!translatedText.isEmpty()) {
-            ui->textBrowser->append("\n🌍 翻译结果：\n" + translatedText);
-        } else {
-            ui->textBrowser->append("⚠️ 翻译内容为空。");
-        }
+        ui->plainTextEdit_translate->setPlainText(translatedText);
     });
 }
 
@@ -133,16 +173,60 @@ void MainWindow::onEnterClicked()
     QDate birthDate = ui->dateEdit->date();
     QString gender = ui->comboBox_gender->currentText();
 
-    if (name.isEmpty()) {
-        QMessageBox::warning(this, "输入错误", "请输入姓名！");
+    int id = patientDb->getPatientID(name, birthDate, gender);
+    ui->label_id->setText(QString::number(id));
+
+    if (id <= 0) {
+        qDebug() << "病人未找到：" << name << birthDate << gender;
+        ui->label_apart->setText("无");
+        ui->label_date->setText("无");
+        ui->label_reg->setText("无");
         return;
     }
 
-    int id = patientDb->getPatientID(name, birthDate, gender);
-
-    if (id > 0) {
-        QMessageBox::information(this, "查询成功", QString("找到病人！Patient ID: %1").arg(id));
-    } else {
-        QMessageBox::warning(this, "未找到", "未在数据库中找到该病人。");
+    QList<QVariantMap> registrations = patientDb->getRegistrationsForPatient(id);
+    if (registrations.isEmpty()) {
+        ui->label_apart->setText("无预约");
+        ui->label_date->setText("-");
+        ui->label_reg->setText("无备注");
+        return;
     }
+
+    // 这里仅取第一条挂号信息
+    QVariantMap record = registrations.first();
+    int deptId = record["DepartmentID"].toInt();
+    QString appointmentTime = record["AppointmentTime"].toDateTime().toString("yyyy-MM-dd hh:mm");
+    QString notes = record["AdditionalNotes"].toString();
+
+    // 查找科室名称
+    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
+    QString departmentName = "未知科室";
+
+    if (db.isOpen()) {
+        QSqlQuery deptQuery(db);
+        deptQuery.prepare("SELECT Name FROM Departments WHERE DepartmentID = :id");
+        deptQuery.bindValue(":id", deptId);
+
+        if (deptQuery.exec() && deptQuery.next()) {
+            departmentName = deptQuery.value("Name").toString();
+        } else {
+            qDebug() << "查询科室失败：" << deptQuery.lastError().text();
+        }
+    } else {
+        qDebug() << "数据库未打开，无法查找科室名";
+    }
+
+    ui->label_apart->setText(departmentName);
+    ui->label_date->setText(appointmentTime);
+    ui->label_reg->setText(notes);
+}
+
+void MainWindow::onClearClicked()
+{
+    ui->lineEdit_name->clear();
+    ui->dateEdit->clear();
+    ui->label_id->clear();
+    ui->label_reg->clear();
+
+    qDebug()<< QString::fromStdString(clickedAddress);
 }

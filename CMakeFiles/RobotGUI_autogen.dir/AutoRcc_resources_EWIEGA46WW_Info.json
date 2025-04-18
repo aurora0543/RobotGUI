@@ -1,0 +1,25 @@
+{
+	"BUILD_DIR" : "/root/RobotGUI/RobotGUI_autogen",
+	"CMAKE_BINARY_DIR" : "/root/RobotGUI",
+	"CMAKE_CURRENT_BINARY_DIR" : "/root/RobotGUI",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/root/RobotGUI",
+	"CMAKE_SOURCE_DIR" : "/root/RobotGUI",
+	"GENERATOR" : "Unix Makefiles",
+	"INCLUDE_DIR" : "/root/RobotGUI/RobotGUI_autogen/include",
+	"INPUTS" : 
+	[
+		"/root/RobotGUI/resources/background.png",
+		"/root/RobotGUI/resources/map.json",
+		"/root/RobotGUI/resources/hospital_map.svg"
+	],
+	"LOCK_FILE" : "/root/RobotGUI/CMakeFiles/RobotGUI_autogen.dir/AutoRcc_resources_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "resources" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_resources.cpp",
+	"RCC_EXECUTABLE" : "/usr/lib/qt6/libexec/rcc",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "/root/RobotGUI/CMakeFiles/RobotGUI_autogen.dir/AutoRcc_resources_EWIEGA46WW_Used.txt",
+	"SOURCE" : "/root/RobotGUI/resources.qrc",
+	"VERBOSITY" : 0
+}

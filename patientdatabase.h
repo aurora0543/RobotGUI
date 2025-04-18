@@ -24,6 +24,7 @@ public:
     int getPatientID(const QString &name, const QDate &birthDate, const QString &gender);
 
     QSqlQuery getAllPatients();
+    QList<QVariantMap> getRegistrationsForPatient(int patientId);
 
 private:
     QSqlDatabase db;

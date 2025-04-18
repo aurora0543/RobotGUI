@@ -24,6 +24,8 @@ set(PROJECT_SOURCES
     svgviewer.h
     patientdatabase.cpp
     patientdatabase.h
+    globals.cpp
+    globals.h
 )
 
 # 创建可执行文件（适用于 Qt6）

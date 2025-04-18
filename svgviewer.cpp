@@ -9,6 +9,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTextBrowser>
+#include <QString>
+#include <glob.h>
 
 SvgViewer::SvgViewer(QWidget* parent)
     : QGraphicsView(parent),
@@ -52,27 +55,46 @@ void SvgViewer::loadSvg(const QString &filePath) {
 void SvgViewer::mousePressEvent(QMouseEvent* event) {
     QPointF scenePos = mapToScene(event->pos());
     QRectF rect = scene->sceneRect();
+    
+    QTextBrowser* browser = nullptr;
+    if (parentWidget())
+        browser = parentWidget()->findChild<QTextBrowser*>("textBrowser_log");
 
     if (!rect.isValid() || rect.isEmpty()) {
-        qDebug() << "❌ 无法获取背景区域信息！";
+        if (browser)
+            browser->append(QStringLiteral("❌ 无法获取背景区域信息！"));
+        else
+            qDebug() << "❌ 无法获取背景区域信息！";
     } else {
         double relativeX = (scenePos.x() - rect.x()) / rect.width();
         double relativeY = (scenePos.y() - rect.y()) / rect.height();
         int col = static_cast<int>(relativeX * 100);
         int row = static_cast<int>(relativeY * 50);
-        qDebug() << "映射到矩阵 (100x50) 中的坐标:" << "(" << col << "," << row << ")";
+        {
+            QString msg = QStringLiteral("映射到矩阵 (100x50) 中的坐标: (%1,%2)").arg(col).arg(row);
+            if (browser)
+                browser->append(msg);
+            else
+                qDebug() << msg;
+        }
 
         // 加载 JSON 文件
         QFile file(":/map/resources/map.json");
         if (!file.open(QIODevice::ReadOnly)) {
-            qWarning() << "无法打开 JSON 文件！";
+            if (browser)
+                browser->append(QStringLiteral("无法打开 JSON 文件！"));
+            else
+                qWarning() << "无法打开 JSON 文件！";
             return;
         }
 
         QByteArray data = file.readAll();
         QJsonDocument doc = QJsonDocument::fromJson(data);
         if (!doc.isObject()) {
-            qWarning() << "JSON 解析失败！";
+            if (browser)
+                browser->append(QStringLiteral("JSON 解析失败！"));
+            else
+                qWarning() << "JSON 解析失败！";
             return;
         }
 
@@ -88,14 +110,25 @@ void SvgViewer::mousePressEvent(QMouseEvent* event) {
             int y2 = dept["y2"].toInt();
 
             if (col >= x1 && col <= x2 && row >= y1 && row <= y2) {
-                qDebug() << "📍 属于科室:" << dept["name"].toString();
+                QString deptName = dept["name"].toString();
+                if (browser)
+                {
+                    browser->append(QStringLiteral("📍 属于科室: %1").arg(deptName));
+                    extern std::string clickedAddress = deptName.toStdString();
+                }
+                else
+                    qDebug() << "📍 属于科室:" << deptName;
                 found = true;
+
                 break;
             }
         }
 
         if (!found) {
-            qDebug() << "点击位置未落入任何科室范围";
+            if (browser)
+                browser->append(QStringLiteral("点击位置未落入任何科室范围"));
+            else
+                qDebug() << "点击位置未落入任何科室范围";
         }
     }
 

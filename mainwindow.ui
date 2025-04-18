@@ -37,7 +37,10 @@
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_top">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
@@ -95,7 +98,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="page_patientInfo">
         <widget class="QWidget" name="gridLayoutWidget_2">
@@ -108,44 +111,10 @@
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="3" column="1" colspan="3">
-           <widget class="QLabel" name="label_reg">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_8">
             <property name="text">
              <string>Registration:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QDateEdit" name="dateEdit"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_name__">
-            <property name="text">
-             <string>Full Name:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="lineEdit_name">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_dob__">
-            <property name="text">
-             <string>Date of Birth:</string>
             </property>
            </widget>
           </item>
@@ -162,24 +131,39 @@
             </property>
            </spacer>
           </item>
-          <item row="2" column="1" colspan="3">
-           <widget class="QLabel" name="label_id">
-            <property name="text">
-             <string/>
+          <item row="0" column="5">
+           <widget class="QComboBox" name="comboBox_gender">
+            <item>
+             <property name="text">
+              <string notr="true">Male</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Female</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string notr="true">Other</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_name">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
            </widget>
           </item>
-          <item row="0" column="6">
-           <widget class="QPushButton" name="pushButton_enter">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_name__">
             <property name="text">
-             <string>Enter</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="6">
-           <widget class="QPushButton" name="pushButton_nav">
-            <property name="text">
-             <string>Nav</string>
+             <string>Full Name:</string>
             </property>
            </widget>
           </item>
@@ -203,6 +187,20 @@
             </property>
            </widget>
           </item>
+          <item row="6" column="6">
+           <widget class="QPushButton" name="pushButton_nav">
+            <property name="text">
+             <string>Nav</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_dob__">
+            <property name="text">
+             <string>Date of Birth:</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="7">
            <widget class="QPushButton" name="pushButton_clear">
             <property name="text">
@@ -210,10 +208,20 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="7">
-           <widget class="QPushButton" name="pushButton_help">
+          <item row="0" column="6">
+           <widget class="QPushButton" name="pushButton_enter">
             <property name="text">
-             <string>Help</string>
+             <string>Enter</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QDateEdit" name="dateEdit"/>
+          </item>
+          <item row="2" column="1" colspan="3">
+           <widget class="QLabel" name="label_id">
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
@@ -224,23 +232,46 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="5">
-           <widget class="QComboBox" name="comboBox_gender">
-            <item>
-             <property name="text">
-              <string notr="true">Male</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string notr="true">Female</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string notr="true">Other</string>
-             </property>
-            </item>
+          <item row="6" column="7">
+           <widget class="QPushButton" name="pushButton_help">
+            <property name="text">
+             <string>Help</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1" colspan="2">
+           <widget class="QLabel" name="label_reg">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Apartment:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="4" colspan="2">
+           <widget class="QLabel" name="label_apart">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="6">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Date:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="7">
+           <widget class="QLabel" name="label_date">
+            <property name="text">
+             <string/>
+            </property>
            </widget>
           </item>
          </layout>
@@ -252,45 +283,11 @@
           <rect>
            <x>0</x>
            <y>9</y>
-           <width>902</width>
+           <width>911</width>
            <height>661</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="3" column="1">
-           <widget class="QTableWidget" name="tableWidget">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>1000</height>
-             </size>
-            </property>
-            <row>
-             <property name="text">
-              <string>A</string>
-             </property>
-            </row>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QLabel" name="label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>The hospital floor plan is shown below, please retrieve your desired destination in the map. You can also search by category in the sidebar</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="1">
            <widget class="SvgViewer" name="graphicsView_map">
             <property name="sizePolicy">
@@ -312,6 +309,22 @@
              </size>
             </property>
            </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>The hospital floor plan is shown below, please retrieve your desired destination in the map. You can also search by category in the sidebar</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QTextBrowser" name="textBrowser_log"/>
           </item>
          </layout>
         </widget>
@@ -360,7 +373,7 @@
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="2" column="1">
-             <widget class="QComboBox" name="comboBox_3">
+             <widget class="QComboBox" name="comboBox_from">
               <item>
                <property name="text">
                 <string>English</string>
@@ -369,6 +382,27 @@
               <item>
                <property name="text">
                 <string>Chinese</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="0" column="0" colspan="6">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QComboBox" name="comboBox_to">
+              <item>
+               <property name="text">
+                <string>Chinese</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>English</string>
                </property>
               </item>
              </widget>
@@ -386,45 +420,10 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="3">
-             <widget class="QComboBox" name="comboBox_2">
-              <item>
-               <property name="text">
-                <string>English</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Chinese</string>
-               </property>
-              </item>
-             </widget>
-            </item>
             <item row="2" column="4">
              <widget class="QPushButton" name="pushButton_4">
               <property name="text">
-               <string>Press To Speak</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0" colspan="6">
-             <widget class="QTextBrowser" name="textBrowser">
-              <property name="html">
-               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-hr { height: 1px; border-width: 0; }
-li.unchecked::marker { content: &quot;\2610&quot;; }
-li.checked::marker { content: &quot;\2612&quot;; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt;&quot;&gt;fuck you!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="5">
-             <widget class="QPushButton" name="pushButton_3">
-              <property name="text">
-               <string>Clear</string>
+               <string>Enter</string>
               </property>
              </widget>
             </item>
@@ -441,12 +440,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
               </property>
              </widget>
             </item>
-            <item row="0" column="0" colspan="6">
-             <widget class="QLabel" name="label_2">
+            <item row="2" column="5">
+             <widget class="QPushButton" name="pushButton_3">
               <property name="text">
-               <string>TextLabel</string>
+               <string>Clear</string>
               </property>
              </widget>
+            </item>
+            <item row="1" column="0" colspan="6">
+             <widget class="QPlainTextEdit" name="plainTextEdit_translate"/>
             </item>
            </layout>
           </widget>
@@ -467,25 +469,20 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <height>19</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionOpen"/>
-   </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>View</string>
     </property>
     <addaction name="actionFull_Screen"/>
+    <addaction name="actionMinimize_Screen"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionExit"/>
    </widget>
-   <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -500,9 +497,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <string>Full Screen</string>
    </property>
   </action>
-  <action name="actionOpen">
+  <action name="action_quit">
    <property name="text">
-    <string>Open</string>
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionMinimize_Screen">
+   <property name="text">
+    <string>Minimize Screen</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
    </property>
   </action>
  </widget>
@@ -534,16 +541,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <connection>
    <sender>pushButton_3</sender>
    <signal>clicked()</signal>
-   <receiver>textBrowser</receiver>
+   <receiver>plainTextEdit_translate</receiver>
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>916</x>
-     <y>652</y>
+     <x>251</x>
+     <y>107</y>
     </hint>
     <hint type="destinationlabel">
-     <x>820</x>
-     <y>563</y>
+     <x>251</x>
+     <y>107</y>
     </hint>
    </hints>
   </connection>

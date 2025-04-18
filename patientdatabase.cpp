@@ -92,7 +92,6 @@ int PatientDatabase::getPatientID(const QString &name, const QDate &birthDate, c
     }
 }
 
-
 QSqlQuery PatientDatabase::getAllPatients()
 {
     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
@@ -107,35 +106,35 @@ QSqlQuery PatientDatabase::getAllPatients()
     return query;
 }
 
-void PatientDatabase::printAllPatients()
+
+QList<QVariantMap> PatientDatabase::getRegistrationsForPatient(int patientId)
 {
+    QList<QVariantMap> results;
+
     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
     if (!db.isOpen()) {
-        qDebug() << "无法打印病人列表：数据库未打开";
-        return;
+        qDebug() << "数据库未打开，无法查询挂号信息";
+        return results;
     }
 
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM Patients");
+    query.prepare("SELECT * FROM Registrations WHERE PatientID = :patientId");
+    query.bindValue(":patientId", patientId);
 
     if (!query.exec()) {
-        qDebug() << "查询失败:" << query.lastError().text();
-        return;
+        qDebug() << "查询挂号信息失败:" << query.lastError().text();
+        return results;
     }
 
     while (query.next()) {
-        int id = query.value("PatientID").toInt();
-        QString name = query.value("Name").toString();
-        QDate birthDate = query.value("BirthDate").toDate();
-        QString gender = query.value("Gender").toString();
-        QString visitType = query.value("VisitType").toString();
-        QString photoPath = query.value("PhotoPath").toString();
-
-        qDebug() << "PatientID:" << id
-                 << "| Name:" << name
-                 << "| BirthDate:" << birthDate.toString("yyyy-MM-dd")
-                 << "| Gender:" << gender
-                 << "| VisitType:" << visitType
-                 << "| PhotoPath:" << photoPath;
+        QVariantMap record;
+        record["RegistrationID"] = query.value("RegistrationID");
+        record["PatientID"] = query.value("PatientID");
+        record["DepartmentID"] = query.value("DepartmentID");
+        record["AppointmentTime"] = query.value("AppointmentTime");
+        record["AdditionalNotes"] = query.value("AdditionalNotes");
+        results.append(record);
     }
+
+    return results;
 }

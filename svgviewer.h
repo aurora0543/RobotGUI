@@ -2,6 +2,7 @@
 #define SVGVIEWER_H
 
 #include <QGraphicsView>
+#include <QString>
 
 class QGraphicsScene;
 class QGraphicsSvgItem;
