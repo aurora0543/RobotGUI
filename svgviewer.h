@@ -23,7 +23,7 @@ private:
     QGraphicsSvgItem* backgroundItem; // 显示SVG的背景图层
 
 signals:
-    void departmentSelected(const QString& name);  // 添加这个信号
+    void departmentSelected(const QString& name);
 };
 
 #endif // SVGVIEWER_H

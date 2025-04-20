@@ -19,33 +19,33 @@ SvgViewer::SvgViewer(QWidget* parent)
 {
     setScene(scene);
     setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    // 禁用拖拽，保持视图固定
+    // Disable drag mode to keep the view fixed
     setDragMode(QGraphicsView::NoDrag);
 }
 
 void SvgViewer::loadSvg(const QString &filePath) {
-    // 清空场景
+    // Clear the scene
     scene->clear();
     backgroundItem = nullptr;
 
-    // 使用 QGraphicsSvgItem 加载整个 SVG 图片
+    // Load the entire SVG image using QGraphicsSvgItem
     backgroundItem = new QGraphicsSvgItem(filePath);
     if (!backgroundItem->renderer()->isValid()) {
-        qWarning() << "❌ SVG 加载失败:" << filePath;
+        qWarning() << "❌ Failed to load SVG:" << filePath;
         delete backgroundItem;
         backgroundItem = nullptr;
         return;
     }
-    // 保持图像可见
+    // Keep the image visible
     backgroundItem->setOpacity(1.0);
-    backgroundItem->setZValue(-1);  // 放在最底层
+    backgroundItem->setZValue(-1);  // Put it at the bottom
     scene->addItem(backgroundItem);
 
-    // 设置场景区域为 SVG 背景图层的边界
+    // Set the scene area to the bounding rect of the SVG background
     QRectF rect = backgroundItem->boundingRect();
     scene->setSceneRect(rect);
 
-    // 重置变换，自动适配视图尺寸，并选择合适的缩放（初始放大2倍，可调整）
+    // Reset the transformation, fit the SVG into the view, and apply initial zoom (adjustable)
     resetTransform();
     fitInView(rect, Qt::KeepAspectRatio);
     scale(16.0, 16.0);
@@ -61,29 +61,29 @@ void SvgViewer::mousePressEvent(QMouseEvent* event) {
 
     if (!rect.isValid() || rect.isEmpty()) {
         if (browser)
-            browser->append(QStringLiteral("❌ 无法获取背景区域信息！"));
+            browser->append(QStringLiteral("❌ Unable to retrieve background area information!"));
         else
-            qDebug() << "❌ 无法获取背景区域信息！";
+            qDebug() << "❌ Unable to retrieve background area information!";
     } else {
         double relativeX = (scenePos.x() - rect.x()) / rect.width();
         double relativeY = (scenePos.y() - rect.y()) / rect.height();
         int col = static_cast<int>(relativeX * 100);
         int row = static_cast<int>(relativeY * 50);
         {
-            QString msg = QStringLiteral("映射到矩阵 (100x50) 中的坐标: (%1,%2)").arg(col).arg(row);
+            QString msg = QStringLiteral("Mapped to matrix (100x50) coordinates: (%1,%2)").arg(col).arg(row);
             if (browser)
                 browser->append(msg);
             else
                 qDebug() << msg;
         }
 
-        // 加载 JSON 文件
+        // Load the JSON file
         QFile file("/home/team24/RoboHospitalGuide/RobotGUI/resources/map.json");
         if (!file.open(QIODevice::ReadOnly)) {
             if (browser)
-                browser->append(QStringLiteral("无法打开 JSON 文件！"));
+                browser->append(QStringLiteral("Failed to open JSON file!"));
             else
-                qWarning() << "无法打开 JSON 文件！";
+                qWarning() << "Failed to open JSON file!";
             return;
         }
 
@@ -91,9 +91,9 @@ void SvgViewer::mousePressEvent(QMouseEvent* event) {
         QJsonDocument doc = QJsonDocument::fromJson(data);
         if (!doc.isObject()) {
             if (browser)
-                browser->append(QStringLiteral("JSON 解析失败！"));
+                browser->append(QStringLiteral("Failed to parse JSON!"));
             else
-                qWarning() << "JSON 解析失败！";
+                qWarning() << "Failed to parse JSON!";
             return;
         }
 
@@ -112,23 +112,22 @@ void SvgViewer::mousePressEvent(QMouseEvent* event) {
                 QString deptName = dept["name"].toString();
                 if (browser)
                 {
-                    browser->append(QStringLiteral("📍 属于科室: %1").arg(deptName));
+                    browser->append(QStringLiteral("📍 Department: %1").arg(deptName));
                     emit departmentSelected(deptName);
                 }
                 else
-                    qDebug() << "📍 属于科室:" << deptName;
+                    qDebug() << "📍 Department:" << deptName;
                 
                 found = true;
-
                 break;
             }
         }
 
         if (!found) {
             if (browser)
-                browser->append(QStringLiteral("点击位置未落入任何科室范围"));
+                browser->append(QStringLiteral("The clicked position does not fall into any department area"));
             else
-                qDebug() << "点击位置未落入任何科室范围";
+                qDebug() << "The clicked position does not fall into any department area";
         }
     }
 
@@ -136,7 +135,7 @@ void SvgViewer::mousePressEvent(QMouseEvent* event) {
 }
 
 void SvgViewer::wheelEvent(QWheelEvent* event) {
-    // 保留滚轮缩放功能：上滚放大，下滚缩小
+    // Keep scroll-to-zoom enabled: scroll up to zoom in, scroll down to zoom out
     const double scaleFactor = 1.2;
     if (event->angleDelta().y() > 0)
         scale(scaleFactor, scaleFactor);

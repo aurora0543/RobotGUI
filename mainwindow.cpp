@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_clear, &QPushButton::clicked, this, &MainWindow::onClearClicked);
     connect(ui->pushButton_nav, &QPushButton::clicked, this, &MainWindow::on_pushButton_nav_clicked);
     connect(ui->actionExit, &QAction::triggered, this, [](){
-        qApp->quit(); // 替代 close()
+        qApp->quit(); 
     });
     connect(ui->actionFull_Screen, &QAction::triggered, this, [this] {
         if (isFullScreenNow) {
@@ -52,11 +52,11 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     connect(ui->actionAbout, &QAction::triggered, this, []() {
-        QMessageBox::about(nullptr, "关于", "医院导诊系统\n版本 1.0\n作者: Your Name");
+        QMessageBox::about(nullptr, "About", "Hospital Robot Guide\nVersion 2.1\nAuthor: Team 24");
     });
 
     connect(ui->graphicsView_map, &SvgViewer::departmentSelected, this, [=](const QString& deptName){
-        ui->label_apart->setText(deptName);  // 假设你界面上有 QLabel 叫 label_department
+        ui->label_apart->setText(deptName); 
     });
 
 
@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     PatientDatabase Db;
     if(!Db.connectToDatabase(""))
     {
-        qDebug()<<"数据库错误", "无法连接到数据库！";
+        qDebug() << "Database error: Unable to connect to the database!";
     }
     // 连接信号槽
     controller.init();
@@ -89,14 +89,9 @@ void MainWindow::on_pushButton_nav_clicked()
 {
     // 1. 切换页面
     ui->stackedWidget_mainDisplay->setCurrentWidget(ui->page_navigation);
-
-    // 2. 获取要导航的科室名称（假设你有一个 label_aprt 里保存了目标科室名）
     QString departmentName = ui->label_apart->text();
     controller.startNavigationTo(departmentName);
-    // 3. 在终端输出或后续使用
-    qDebug() << "🧭 正在导航到科室：" << departmentName;
-
-    // 如果你希望返回这个值，也可以通过信号发出去或保存到成员变量
+    qDebug() << "Navigating to department:" << departmentName;
 }
 
 void MainWindow::updateTime()
@@ -109,7 +104,7 @@ void MainWindow::translateTextBrowserContent()
 {
     QString originalText = ui->plainTextEdit_translate->toPlainText();
     if (originalText.trimmed().isEmpty()) {
-        qDebug() << "⚠️ 无原始文本，不执行翻译。";
+        qDebug() << "No text to translate!";
         return;
     }
 
@@ -141,7 +136,7 @@ void MainWindow::translateTextBrowserContent()
 
     connect(reply, &QNetworkReply::finished, this, [this, reply]() {
         if (reply->error() != QNetworkReply::NoError) {
-            qDebug() << "❌ 网络错误:" << reply->errorString();
+            qDebug() << "Network error:" << reply->errorString();
             reply->deleteLater();
             return;
         }
@@ -152,18 +147,18 @@ void MainWindow::translateTextBrowserContent()
         QJsonParseError parseError;
         QJsonDocument json = QJsonDocument::fromJson(responseData, &parseError);
         if (parseError.error != QJsonParseError::NoError) {
-            qDebug() << "⚠️ JSON 解析失败:" << parseError.errorString();
+            qDebug() << "JSON parsing failed:" << parseError.errorString();
             return;
         }
 
         if (!json.isArray()) {
-            qDebug() << "⚠️ 响应不是数组格式！";
+            qDebug() << "Response is not in array format!";
             return;
         }
 
         QJsonArray rootArray = json.array();
         if (rootArray.isEmpty() || !rootArray[0].isArray()) {
-            qDebug() << "⚠️ 无翻译内容！";
+            qDebug() << "Translation content is empty!";
             return;
         }
 
@@ -188,18 +183,18 @@ void MainWindow::onEnterClicked()
     ui->label_id->setText(QString::number(id));
 
     if (id <= 0) {
-        qDebug() << "病人未找到：" << name << birthDate << gender;
-        ui->label_apart->setText("无");
-        ui->label_date->setText("无");
-        ui->label_reg->setText("无");
+        qDebug() << "Patient not found:" << name << birthDate << gender;
+        ui->label_apart->setText("None");
+        ui->label_date->setText("None");
+        ui->label_reg->setText("None");
         return;
     }
 
     QList<QVariantMap> registrations = patientDb->getRegistrationsForPatient(id);
     if (registrations.isEmpty()) {
-        ui->label_apart->setText("无预约");
+        ui->label_apart->setText("No appointments");
         ui->label_date->setText("-");
-        ui->label_reg->setText("无备注");
+        ui->label_reg->setText("No notes");
         return;
     }
 
@@ -211,7 +206,7 @@ void MainWindow::onEnterClicked()
 
     // 查找科室名称
     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
-    QString departmentName = "未知科室";
+    QString departmentName = "Unknown Department";
 
     if (db.isOpen()) {
         QSqlQuery deptQuery(db);
@@ -221,10 +216,10 @@ void MainWindow::onEnterClicked()
         if (deptQuery.exec() && deptQuery.next()) {
             departmentName = deptQuery.value("Name").toString();
         } else {
-            qDebug() << "查询科室失败：" << deptQuery.lastError().text();
+            qDebug() << "Query department failed:" << deptQuery.lastError().text();
         }
     } else {
-        qDebug() << "数据库未打开，无法查找科室名";
+        qDebug() << "Database not open, unable to find department name";
     }
 
     ui->label_apart->setText(departmentName);
@@ -247,22 +242,21 @@ bool MainWindow::takePhoto(const std::string& savePath, int delay_ms)
     
     int ret = std::system(command.c_str());
     if (ret != 0) {
-        std::cerr << "❌ 拍照失败，命令执行错误，退出码: " << ret << std::endl;
+        std::cerr << "❌ Photo capture failed, command execution error, exit code: " << ret << std::endl;
         return false;
     }
 
-    std::cout << "📸 图片已保存至: " << savePath << std::endl;
+    std::cout << "📸 Photo saved to: " << savePath << std::endl;
     return true;
 }
 
 void MainWindow::showPhotoOnCameraWidget(const QString& photoPath) {
     if (!QFile::exists(photoPath)) {
-        qWarning() << "图片不存在：" << photoPath;
+        qWarning() << "Photo does not exist:" << photoPath;
         return;
     }
 
     if (!photoLabel) {
-        // 创建 QLabel 作为图像显示区域，放在 cameraWidget 上
         photoLabel = new QLabel(ui->cameraWidget);
         photoLabel->setGeometry(ui->cameraWidget->rect());
         photoLabel->setScaledContents(true); // 自动缩放
@@ -271,7 +265,7 @@ void MainWindow::showPhotoOnCameraWidget(const QString& photoPath) {
 
     QPixmap pix(photoPath);
     if (pix.isNull()) {
-        qWarning() << "加载图像失败：" << photoPath;
+        qWarning() << "Photo does not exist:" << photoPath;
         return;
     }
 
@@ -286,9 +280,9 @@ int MainWindow::face_recognition(const std::string& imagePath)
 
     auto [idStr, confidence] = recognizer.recognize(imagePath);
 
-    qDebug() << "识别到ID:" << QString::fromStdString(idStr) << "置信度:" << confidence;
+    qDebug() << "Recognized ID:" << QString::fromStdString(idStr) << "Confidence:" << confidence;
 
-    // 提取文件名前缀当作整数ID（比如 "2.jpg" -> 2）
+    // 提取文件名前缀当作整数ID
     QString qid = QString::fromStdString(idStr).split(".").first();
     bool ok = false;
     int id = qid.toInt(&ok);
@@ -299,22 +293,21 @@ int MainWindow::face_recognition(const std::string& imagePath)
 void MainWindow::loadPatientInfoByID(int id)
 {
     if (id <= 0) {
-        qDebug() << "无效ID：" << id;
-        ui->label_apart->setText("无");
-        ui->label_date->setText("无");
-        ui->label_reg->setText("无");
-        ui->lineEdit_name->setText("无");
+        qDebug() << "Invalid ID:" << id;
+        ui->label_apart->setText("None");
+        ui->label_date->setText("None");
+        ui->label_reg->setText("None");
+        ui->lineEdit_name->setText("None");
         ui->dateEdit->setDate(QDate::currentDate());
         return;
     }
 
     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
     if (!db.isOpen()) {
-        qDebug() << "数据库未打开，无法加载病人信息";
+        qDebug() << "Database not open, unable to load patient information";
         return;
     }
 
-    // ✅ 查询病人基本信息
     QSqlQuery infoQuery(db);
     infoQuery.prepare("SELECT Name, BirthDate FROM Patients WHERE PatientID = :id");
     infoQuery.bindValue(":id", id);
@@ -325,17 +318,16 @@ void MainWindow::loadPatientInfoByID(int id)
         ui->lineEdit_name->setText(name);
         ui->dateEdit->setDate(birthDate);
     } else {
-        qDebug() << "查询病人基本信息失败：" << infoQuery.lastError().text();
-        ui->lineEdit_name->setText("未知");
+        qDebug() << "Failed to query patient basic information:" << infoQuery.lastError().text();
+        ui->lineEdit_name->setText("Unknown");
         ui->dateEdit->setDate(QDate::currentDate());
     }
 
-    // ✅ 查询挂号信息
     QList<QVariantMap> registrations = patientDb->getRegistrationsForPatient(id);
     if (registrations.isEmpty()) {
-        ui->label_apart->setText("无预约");
+        ui->label_apart->setText("No appointments");
         ui->label_date->setText("-");
-        ui->label_reg->setText("无备注");
+        ui->label_reg->setText("No notes");
         return;
     }
 
@@ -344,7 +336,7 @@ void MainWindow::loadPatientInfoByID(int id)
     QString appointmentTime = record["AppointmentTime"].toDateTime().toString("yyyy-MM-dd hh:mm");
     QString notes = record["AdditionalNotes"].toString();
 
-    QString departmentName = "未知科室";
+    QString departmentName = "Unknown Department";
 
     QSqlQuery deptQuery(db);
     deptQuery.prepare("SELECT Name FROM Departments WHERE DepartmentID = :id");
@@ -353,7 +345,7 @@ void MainWindow::loadPatientInfoByID(int id)
     if (deptQuery.exec() && deptQuery.next()) {
         departmentName = deptQuery.value("Name").toString();
     } else {
-        qDebug() << "查询科室失败：" << deptQuery.lastError().text();
+        qDebug() << "Failed to query department:" << deptQuery.lastError().text();
     }
 
     ui->label_apart->setText(departmentName);
@@ -361,61 +353,10 @@ void MainWindow::loadPatientInfoByID(int id)
     ui->label_reg->setText(notes);
 }
 
-
-// void MainWindow::loadPatientInfoByID(int id)
-// {
-//     if (id <= 0) {
-//         qDebug() << "无效ID：" << id;
-//         ui->label_apart->setText("无");
-//         ui->label_date->setText("无");
-//         ui->label_reg->setText("无");
-//         return;
-//     }
-
-//     QList<QVariantMap> registrations = patientDb->getRegistrationsForPatient(id);
-//     if (registrations.isEmpty()) {
-//         ui->label_apart->setText("无预约");
-//         ui->label_date->setText("-");
-//         ui->label_reg->setText("无备注");
-//         return;
-//     }
-
-//     QVariantMap record = registrations.first();
-//     int deptId = record["DepartmentID"].toInt();
-//     QString appointmentTime = record["AppointmentTime"].toDateTime().toString("yyyy-MM-dd hh:mm");
-//     QString notes = record["AdditionalNotes"].toString();
-
-//     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
-//     QString departmentName = "未知科室";
-
-//     if (db.isOpen()) {
-//         QSqlQuery deptQuery(db);
-//         deptQuery.prepare("SELECT Name FROM Departments WHERE DepartmentID = :id");
-//         deptQuery.bindValue(":id", deptId);
-
-//         if (deptQuery.exec() && deptQuery.next()) {
-//             departmentName = deptQuery.value("Name").toString();
-//         } else {
-//             qDebug() << "查询科室失败：" << deptQuery.lastError().text();
-//         }
-//     } else {
-//         qDebug() << "数据库未打开，无法查找科室名";
-//     }
-
-//     ui->label_apart->setText(departmentName);
-//     ui->label_date->setText(appointmentTime);
-//     ui->label_reg->setText(notes);
-// }
-
 void MainWindow::onCaptureButtonClicked()
 {
-    // 1. 拍照
     takePhoto("/home/team24/RoboHospitalGuide/source/tmp/tmp.jpg");
-
-    // 2. 显示照片
     showPhotoOnCameraWidget("/home/team24/RoboHospitalGuide/source/tmp/tmp.jpg");
-
-    // 3. 人脸识别
     int id = face_recognition("/home/team24/RoboHospitalGuide/source/tmp/tmp.jpg");
     loadPatientInfoByID(id);
 }

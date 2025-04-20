@@ -19,7 +19,7 @@ bool PatientDatabase::connectToDatabase(const QString &)
         db = QSqlDatabase::database("hospital_connection");
     } else {
         db = QSqlDatabase::addDatabase("QMYSQL", "hospital_connection");
-        db.setHostName("192.168.1.104");
+        db.setHostName("0.0.0.0");
         db.setPort(3306);
         db.setDatabaseName("HospitalGuide");
         db.setUserName("remote_user");
@@ -27,11 +27,11 @@ bool PatientDatabase::connectToDatabase(const QString &)
     }
 
     if (!db.open()) {
-        qDebug() << "数据库连接失败:" << db.lastError().text();
+        qDebug() << "Failed to connect to database:" << db.lastError().text();
         return false;
     }
 
-    qDebug() << "成功连接到数据库";
+    qDebug() << "Successfully connected to database";
     return true;
 }
 
@@ -41,7 +41,7 @@ bool PatientDatabase::addPatient(int id, const QString &name, const QDate &birth
 {
     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
     if (!db.isOpen()) {
-        qDebug() << "添加病人失败：数据库未打开";
+        qDebug() << "Failed to add patient: Database is not open!";
         return false;
     }
 
@@ -56,11 +56,11 @@ bool PatientDatabase::addPatient(int id, const QString &name, const QDate &birth
     query.bindValue(":photoPath", photoPath);
 
     if (!query.exec()) {
-        qDebug() << "添加病人失败:" << query.lastError().text();
+        qDebug() << "Failed to add patient:" << query.lastError().text();
         return false;
     }
 
-    qDebug() << "成功添加病人:" << name;
+    qDebug() << "Successfully added patient:" << name;
     return true;
 }
 
@@ -68,12 +68,12 @@ int PatientDatabase::getPatientID(const QString &name, const QDate &birthDate, c
 {
     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
     if (!db.isOpen()) {
-        qDebug() << "数据库未打开！";
+        qDebug() << "Database is not open!";
         return -1;
     }
 
 
-    QSqlQuery query(db);  // 关键点：绑定连接！
+    QSqlQuery query(db);  
 
     query.prepare("SELECT PatientID FROM Patients WHERE Name = :name");
     query.bindValue(":name", name);
@@ -81,7 +81,7 @@ int PatientDatabase::getPatientID(const QString &name, const QDate &birthDate, c
     query.bindValue(":gender", gender);
 
     if (!query.exec()) {
-        qDebug() << "查询失败:" << query.lastError().text();
+        qDebug() << "Failed to query patient information:" << query.lastError().text();
         return -1;
     }
 
@@ -100,7 +100,7 @@ QSqlQuery PatientDatabase::getAllPatients()
     query.prepare("SELECT * FROM Patients");
 
     if (!query.exec()) {
-        qDebug() << "查询失败:" << query.lastError().text();
+        qDebug() << "Failed to query patient information:" << query.lastError().text();
     }
 
     return query;
@@ -113,7 +113,7 @@ QList<QVariantMap> PatientDatabase::getRegistrationsForPatient(int patientId)
 
     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
     if (!db.isOpen()) {
-        qDebug() << "数据库未打开，无法查询挂号信息";
+        qDebug() << "Database is not open, unable to query registration information";
         return results;
     }
 
@@ -122,7 +122,7 @@ QList<QVariantMap> PatientDatabase::getRegistrationsForPatient(int patientId)
     query.bindValue(":patientId", patientId);
 
     if (!query.exec()) {
-        qDebug() << "查询挂号信息失败:" << query.lastError().text();
+        qDebug() << "Failed to query appointment information:" << query.lastError().text();
         return results;
     }
 
