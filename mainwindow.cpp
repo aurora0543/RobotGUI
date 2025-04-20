@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDate>
-
+#include <QFile>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -18,6 +18,11 @@
 
 #include <QMessageBox>
 #include "maincontroller.h"
+#include "face_recognizer.h"
+#include <QMediaDevices>
+
+#include <QPixmap>
+#include <QImage>
 
 std::string run_spark_asr();
 
@@ -27,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     networkManager = new QNetworkAccessManager(this);
+
+
     connect(ui->pushButton_4, &QPushButton::clicked, this, &MainWindow::translateTextBrowserContent);
     connect(ui->pushButton_enter, &QPushButton::clicked, this, &MainWindow::onEnterClicked);
     connect(ui->pushButton_clear, &QPushButton::clicked, this, &MainWindow::onClearClicked);
@@ -231,4 +238,119 @@ void MainWindow::onClearClicked()
     ui->dateEdit->clear();
     ui->label_id->clear();
     ui->label_reg->clear();
+}
+
+bool MainWindow::takePhoto(const std::string& savePath, int delay_ms)
+{
+    std::string command = "libcamera-still -t " + std::to_string(delay_ms) +
+                          " --width 640 --height 480 -o " + savePath + " --nopreview";
+    
+    int ret = std::system(command.c_str());
+    if (ret != 0) {
+        std::cerr << "❌ 拍照失败，命令执行错误，退出码: " << ret << std::endl;
+        return false;
+    }
+
+    std::cout << "📸 图片已保存至: " << savePath << std::endl;
+    return true;
+}
+
+void MainWindow::showPhotoOnCameraWidget(const QString& photoPath) {
+    if (!QFile::exists(photoPath)) {
+        qWarning() << "图片不存在：" << photoPath;
+        return;
+    }
+
+    if (!photoLabel) {
+        // 创建 QLabel 作为图像显示区域，放在 cameraWidget 上
+        photoLabel = new QLabel(ui->cameraWidget);
+        photoLabel->setGeometry(ui->cameraWidget->rect());
+        photoLabel->setScaledContents(true); // 自动缩放
+        photoLabel->setStyleSheet("background-color: black;");
+    }
+
+    QPixmap pix(photoPath);
+    if (pix.isNull()) {
+        qWarning() << "加载图像失败：" << photoPath;
+        return;
+    }
+
+    photoLabel->setPixmap(pix);
+    photoLabel->show();
+}
+
+int MainWindow::face_recognition(const std::string& imagePath)
+{
+    FaceRecognizerLib recognizer;
+    recognizer.init("/home/team24/RoboHospitalGuide/source/face");
+
+    auto [idStr, confidence] = recognizer.recognize(imagePath);
+
+    qDebug() << "识别到ID:" << QString::fromStdString(idStr) << "置信度:" << confidence;
+
+    // 提取文件名前缀当作整数ID（比如 "2.jpg" -> 2）
+    QString qid = QString::fromStdString(idStr).split(".").first();
+    bool ok = false;
+    int id = qid.toInt(&ok);
+
+    return ok ? id : -1;
+}
+
+void MainWindow::loadPatientInfoByID(int id)
+{
+    if (id <= 0) {
+        qDebug() << "无效ID：" << id;
+        ui->label_apart->setText("无");
+        ui->label_date->setText("无");
+        ui->label_reg->setText("无");
+        return;
+    }
+
+    QList<QVariantMap> registrations = patientDb->getRegistrationsForPatient(id);
+    if (registrations.isEmpty()) {
+        ui->label_apart->setText("无预约");
+        ui->label_date->setText("-");
+        ui->label_reg->setText("无备注");
+        return;
+    }
+
+    QVariantMap record = registrations.first();
+    int deptId = record["DepartmentID"].toInt();
+    QString appointmentTime = record["AppointmentTime"].toDateTime().toString("yyyy-MM-dd hh:mm");
+    QString notes = record["AdditionalNotes"].toString();
+
+    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
+    QString departmentName = "未知科室";
+
+    if (db.isOpen()) {
+        QSqlQuery deptQuery(db);
+        deptQuery.prepare("SELECT Name FROM Departments WHERE DepartmentID = :id");
+        deptQuery.bindValue(":id", deptId);
+
+        if (deptQuery.exec() && deptQuery.next()) {
+            departmentName = deptQuery.value("Name").toString();
+        } else {
+            qDebug() << "查询科室失败：" << deptQuery.lastError().text();
+        }
+    } else {
+        qDebug() << "数据库未打开，无法查找科室名";
+    }
+
+    ui->label_apart->setText(departmentName);
+    ui->label_date->setText(appointmentTime);
+    ui->label_reg->setText(notes);
+    ui.
+}
+
+void onCaptureButtonClicked()
+{
+    // 1. 拍照
+    takePhoto("/home/team24/RoboHospitalGuide/source/tmp/tmp.jpg");
+
+    // 2. 显示照片
+    showPhotoOnCameraWidget("/home/team24/RoboHospitalGuide/source/tmp/tmp.jpg");
+
+    // 3. 人脸识别
+    int id = face_recognition("/home/team24/RoboHospitalGuide/source/tmp/tmp.jpg");
+    loadPatientInfoByID(id);
 }

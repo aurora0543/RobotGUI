@@ -1,12 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include <QLabel>  
 #include <QMainWindow>
 #include <QNetworkAccessManager>
 #include <string>
 #include "patientdatabase.h"
+#include "face_recognizer.h"
 #include "svgviewer.h"
-
+#include <QVideoWidget> 
 #include "maincontroller.h"
 
 QT_BEGIN_NAMESPACE
@@ -50,7 +51,11 @@ private:
 
 private:
     bool isFullScreenNow = false;
-
-
+    bool takePhoto(const std::string& savePath, int delay_ms = 500);
+    QLabel* photoLabel = nullptr;
+    QVideoWidget* videoWidget = nullptr;
+    void showPhotoOnCameraWidget(const QString& photoPath);
+    int face_recognition(const std::string& imagePath);
+    void loadPatientInfoByID(int id);
 };
 #endif // MAINWINDOW_H

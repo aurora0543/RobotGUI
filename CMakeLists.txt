@@ -12,7 +12,11 @@ add_library(RobotGUI STATIC
     resources.qrc
     patientdatabase.cpp
     patientdatabase.h
+    ../src/core/face_recognizer.cpp
+    ../include/core/face_recognizer.h
 )
+
+
 
 target_link_libraries(RobotGUI PRIVATE
     Qt6::Core
@@ -22,6 +26,8 @@ target_link_libraries(RobotGUI PRIVATE
     Qt6::Sql
     Qt6::Xml
     Qt6::Network
+    Qt6::Multimedia
+    Qt6::MultimediaWidgets
 )
 
 target_include_directories(RobotGUI PRIVATE
@@ -29,4 +35,5 @@ target_include_directories(RobotGUI PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/core
     ${OpenCV_INCLUDE_DIRS} 
+    ${Qt6Multimedia_INCLUDE_DIRS}
 )
