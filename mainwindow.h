@@ -57,5 +57,6 @@ private:
     void showPhotoOnCameraWidget(const QString& photoPath);
     int face_recognition(const std::string& imagePath);
     void loadPatientInfoByID(int id);
+    void onCaptureButtonClicked();
 };
 #endif // MAINWINDOW_H

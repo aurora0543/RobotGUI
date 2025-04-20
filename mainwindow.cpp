@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     networkManager = new QNetworkAccessManager(this);
 
-
+    connect(ui->pushButton_help, &QPushButton::clicked, this, &MainWindow::onCaptureButtonClicked);
     connect(ui->pushButton_4, &QPushButton::clicked, this, &MainWindow::translateTextBrowserContent);
     connect(ui->pushButton_enter, &QPushButton::clicked, this, &MainWindow::onEnterClicked);
     connect(ui->pushButton_clear, &QPushButton::clicked, this, &MainWindow::onClearClicked);
@@ -303,9 +303,34 @@ void MainWindow::loadPatientInfoByID(int id)
         ui->label_apart->setText("无");
         ui->label_date->setText("无");
         ui->label_reg->setText("无");
+        ui->lineEdit_name->setText("无");
+        ui->dateEdit->setDate(QDate::currentDate());
         return;
     }
 
+    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
+    if (!db.isOpen()) {
+        qDebug() << "数据库未打开，无法加载病人信息";
+        return;
+    }
+
+    // ✅ 查询病人基本信息
+    QSqlQuery infoQuery(db);
+    infoQuery.prepare("SELECT Name, BirthDate FROM Patients WHERE PatientID = :id");
+    infoQuery.bindValue(":id", id);
+
+    if (infoQuery.exec() && infoQuery.next()) {
+        QString name = infoQuery.value("Name").toString();
+        QDate birthDate = infoQuery.value("BirthDate").toDate();
+        ui->lineEdit_name->setText(name);
+        ui->dateEdit->setDate(birthDate);
+    } else {
+        qDebug() << "查询病人基本信息失败：" << infoQuery.lastError().text();
+        ui->lineEdit_name->setText("未知");
+        ui->dateEdit->setDate(QDate::currentDate());
+    }
+
+    // ✅ 查询挂号信息
     QList<QVariantMap> registrations = patientDb->getRegistrationsForPatient(id);
     if (registrations.isEmpty()) {
         ui->label_apart->setText("无预约");
@@ -319,30 +344,70 @@ void MainWindow::loadPatientInfoByID(int id)
     QString appointmentTime = record["AppointmentTime"].toDateTime().toString("yyyy-MM-dd hh:mm");
     QString notes = record["AdditionalNotes"].toString();
 
-    QSqlDatabase db = QSqlDatabase::database("hospital_connection");
     QString departmentName = "未知科室";
 
-    if (db.isOpen()) {
-        QSqlQuery deptQuery(db);
-        deptQuery.prepare("SELECT Name FROM Departments WHERE DepartmentID = :id");
-        deptQuery.bindValue(":id", deptId);
+    QSqlQuery deptQuery(db);
+    deptQuery.prepare("SELECT Name FROM Departments WHERE DepartmentID = :id");
+    deptQuery.bindValue(":id", deptId);
 
-        if (deptQuery.exec() && deptQuery.next()) {
-            departmentName = deptQuery.value("Name").toString();
-        } else {
-            qDebug() << "查询科室失败：" << deptQuery.lastError().text();
-        }
+    if (deptQuery.exec() && deptQuery.next()) {
+        departmentName = deptQuery.value("Name").toString();
     } else {
-        qDebug() << "数据库未打开，无法查找科室名";
+        qDebug() << "查询科室失败：" << deptQuery.lastError().text();
     }
 
     ui->label_apart->setText(departmentName);
     ui->label_date->setText(appointmentTime);
     ui->label_reg->setText(notes);
-    ui.
 }
 
-void onCaptureButtonClicked()
+
+// void MainWindow::loadPatientInfoByID(int id)
+// {
+//     if (id <= 0) {
+//         qDebug() << "无效ID：" << id;
+//         ui->label_apart->setText("无");
+//         ui->label_date->setText("无");
+//         ui->label_reg->setText("无");
+//         return;
+//     }
+
+//     QList<QVariantMap> registrations = patientDb->getRegistrationsForPatient(id);
+//     if (registrations.isEmpty()) {
+//         ui->label_apart->setText("无预约");
+//         ui->label_date->setText("-");
+//         ui->label_reg->setText("无备注");
+//         return;
+//     }
+
+//     QVariantMap record = registrations.first();
+//     int deptId = record["DepartmentID"].toInt();
+//     QString appointmentTime = record["AppointmentTime"].toDateTime().toString("yyyy-MM-dd hh:mm");
+//     QString notes = record["AdditionalNotes"].toString();
+
+//     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
+//     QString departmentName = "未知科室";
+
+//     if (db.isOpen()) {
+//         QSqlQuery deptQuery(db);
+//         deptQuery.prepare("SELECT Name FROM Departments WHERE DepartmentID = :id");
+//         deptQuery.bindValue(":id", deptId);
+
+//         if (deptQuery.exec() && deptQuery.next()) {
+//             departmentName = deptQuery.value("Name").toString();
+//         } else {
+//             qDebug() << "查询科室失败：" << deptQuery.lastError().text();
+//         }
+//     } else {
+//         qDebug() << "数据库未打开，无法查找科室名";
+//     }
+
+//     ui->label_apart->setText(departmentName);
+//     ui->label_date->setText(appointmentTime);
+//     ui->label_reg->setText(notes);
+// }
+
+void MainWindow::onCaptureButtonClicked()
 {
     // 1. 拍照
     takePhoto("/home/team24/RoboHospitalGuide/source/tmp/tmp.jpg");
