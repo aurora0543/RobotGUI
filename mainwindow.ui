@@ -98,7 +98,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page_patientInfo">
         <widget class="QWidget" name="gridLayoutWidget_2">
@@ -274,7 +274,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="4">
+          <item row="4" column="0" colspan="6">
            <widget class="QWidget" name="cameraWidget" native="true">
             <property name="minimumSize">
              <size>
@@ -356,7 +356,7 @@
           </rect>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tab_ai">
           <attribute name="title">
