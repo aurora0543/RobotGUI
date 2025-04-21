@@ -14,6 +14,8 @@ add_library(RobotGUI STATIC
     patientdatabase.h
     ../src/core/face_recognizer.cpp
     ../include/core/face_recognizer.h
+    ../src/drivers/motor.cpp
+    ../include/drivers/motor.h
 )
 
 
@@ -34,6 +36,8 @@ target_include_directories(RobotGUI PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/include/core
+    ${PROJECT_SOURCE_DIR}/include/drivers
+    ${PROJECT_SOURCE_DIR}/include/drivers/hal
     ${OpenCV_INCLUDE_DIRS} 
     ${Qt6Multimedia_INCLUDE_DIRS}
 )

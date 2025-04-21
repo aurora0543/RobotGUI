@@ -38,8 +38,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_enter, &QPushButton::clicked, this, &MainWindow::onEnterClicked);
     connect(ui->pushButton_clear, &QPushButton::clicked, this, &MainWindow::onClearClicked);
     connect(ui->pushButton_nav, &QPushButton::clicked, this, &MainWindow::on_pushButton_nav_clicked);
-    connect(ui->actionExit, &QAction::triggered, this, [](){
-        qApp->quit(); 
+    connect(ui->actionExit, &QAction::triggered, this, [this]() {
+        controller.exitSystem();  // 先关闭 motor、清理资源等
+        qApp->quit();             // 然后退出应用
     });
     connect(ui->actionFull_Screen, &QAction::triggered, this, [this] {
         if (isFullScreenNow) {
