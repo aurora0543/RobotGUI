@@ -16,6 +16,8 @@ add_library(RobotGUI STATIC
     ../include/core/face_recognizer.h
     ../src/drivers/motor.cpp
     ../include/drivers/motor.h
+    manual.h
+    manual.cpp
 )
 
 

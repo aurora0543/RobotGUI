@@ -9,7 +9,7 @@
 #include "svgviewer.h"
 #include <QVideoWidget> 
 #include "maincontroller.h"
-
+#include "manual.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
