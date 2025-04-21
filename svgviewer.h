@@ -19,8 +19,8 @@ protected:
     void wheelEvent(QWheelEvent* event) override;
 
 private:
-    QGraphicsScene* scene;           // 场景
-    QGraphicsSvgItem* backgroundItem; // 显示SVG的背景图层
+    QGraphicsScene* scene;           // show SVG
+    QGraphicsSvgItem* backgroundItem; // show background
 
 signals:
     void departmentSelected(const QString& name);

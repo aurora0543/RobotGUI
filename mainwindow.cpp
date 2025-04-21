@@ -39,8 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_clear, &QPushButton::clicked, this, &MainWindow::onClearClicked);
     connect(ui->pushButton_nav, &QPushButton::clicked, this, &MainWindow::on_pushButton_nav_clicked);
     connect(ui->actionExit, &QAction::triggered, this, [this]() {
-        controller.exitSystem();  // 先关闭 motor、清理资源等
-        qApp->quit();             // 然后退出应用
+        controller.exitSystem();  // clos motor
+        qApp->quit();             // clos GUI
     });
     connect(ui->actionFull_Screen, &QAction::triggered, this, [this] {
         if (isFullScreenNow) {
@@ -75,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
     {
         qDebug() << "Database error: Unable to connect to the database!";
     }
-    // 连接信号槽
+    // intit backend
     controller.init();
 
 }
@@ -88,7 +88,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_nav_clicked()
 {
-    // 1. 切换页面
+    // Check if the patient ID is valid
     ui->stackedWidget_mainDisplay->setCurrentWidget(ui->page_navigation);
     QString departmentName = ui->label_apart->text();
     controller.startNavigationTo(departmentName);
@@ -109,7 +109,7 @@ void MainWindow::translateTextBrowserContent()
         return;
     }
 
-    // 获取语言设置
+    // Set up the source and target languages
     QString sourceLang, targetLang;
 
     QString from = ui->comboBox_from->currentText().toLower();
@@ -199,13 +199,13 @@ void MainWindow::onEnterClicked()
         return;
     }
 
-    // 这里仅取第一条挂号信息
+    // get the first record
     QVariantMap record = registrations.first();
     int deptId = record["DepartmentID"].toInt();
     QString appointmentTime = record["AppointmentTime"].toDateTime().toString("yyyy-MM-dd hh:mm");
     QString notes = record["AdditionalNotes"].toString();
 
-    // 查找科室名称
+    // get department name
     QSqlDatabase db = QSqlDatabase::database("hospital_connection");
     QString departmentName = "Unknown Department";
 
@@ -260,7 +260,7 @@ void MainWindow::showPhotoOnCameraWidget(const QString& photoPath) {
     if (!photoLabel) {
         photoLabel = new QLabel(ui->cameraWidget);
         photoLabel->setGeometry(ui->cameraWidget->rect());
-        photoLabel->setScaledContents(true); // 自动缩放
+        photoLabel->setScaledContents(true); // Enable scaling
         photoLabel->setStyleSheet("background-color: black;");
     }
 
@@ -283,7 +283,7 @@ int MainWindow::face_recognition(const std::string& imagePath)
 
     qDebug() << "Recognized ID:" << QString::fromStdString(idStr) << "Confidence:" << confidence;
 
-    // 提取文件名前缀当作整数ID
+    // Extract the prefix of the filename as an integer ID
     QString qid = QString::fromStdString(idStr).split(".").first();
     bool ok = false;
     int id = qid.toInt(&ok);
